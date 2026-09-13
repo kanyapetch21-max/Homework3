@@ -196,6 +196,11 @@ int main(int argc, char **argv) {
             free(originals);
             return 1;
         }
+
+        if (u == v || capacity == 0) {
+            continue;
+        }
+
         add_edge(graph, &originals, &edge_count, &edge_cap, u, v, capacity);
     }
 

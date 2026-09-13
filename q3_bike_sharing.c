@@ -159,6 +159,7 @@ int main(int argc, char **argv) {
     int *demand;
     int edge_cap = 16;
     int edge_count = 0;
+    int real_edge_count = 0;
     int n, demand_count;
     int u, v, capacity;
     int i;
@@ -169,12 +170,6 @@ int main(int argc, char **argv) {
 
     if (argc != 2) {
         fprintf(stderr, "Usage: %s bike_input.txt\n", argv[0]);
-        fprintf(stderr, "Input format:\n");
-        fprintf(stderr, "  N\n");
-        fprintf(stderr, "  E\n");
-        fprintf(stderr, "  u v capacity   repeated E times\n");
-        fprintf(stderr, "  D\n");
-        fprintf(stderr, "  node demand    repeated D times\n");
         return 1;
     }
 
@@ -190,47 +185,49 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    graph = (Edge **)calloc((size_t)n, sizeof(Edge *));
+    graph = (Edge **)calloc((size_t)(n + 1), sizeof(Edge *));
     originals = (OriginalEdge *)malloc(sizeof(OriginalEdge) * edge_cap);
-    demand = (int *)calloc((size_t)n, sizeof(int));
-    if (graph == NULL || originals == NULL || demand == NULL) {
+    demand = (int *)calloc((size_t)(n + 1), sizeof(int));
+    received = (int *)calloc((size_t)(n + 1), sizeof(int));
+    
+
+    if (graph == NULL || originals == NULL || demand == NULL || received == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         fclose(fp);
         return 1;
     }
 
-    if (fscanf(fp, "%d", &edge_count) != 1 || edge_count < 0) {
+    if (fscanf(fp, "%d", &real_edge_count) != 1 || real_edge_count < 0) {
         fprintf(stderr, "Invalid edge count\n");
         fclose(fp);
-        free(graph);
+        free_graph(graph, n + 1);
         free(originals);
         free(demand);
+        free(received);
         return 1;
     }
 
-    {
-        int declared_edges = edge_count;
-        edge_count = 0;
-        while (declared_edges-- > 0) {
-            if (fscanf(fp, "%d %d %d", &u, &v, &capacity) != 3 ||
-                u < 0 || u >= n || v < 0 || v >= n || capacity < 0) {
-                fprintf(stderr, "Invalid edge data\n");
-                fclose(fp);
-                free_graph(graph, n);
-                free(originals);
-                free(demand);
-                return 1;
-            }
-            add_edge(graph, &originals, &edge_count, &edge_cap, u, v, capacity);
+    for (i = 0; i < real_edge_count; i++) {
+        if (fscanf(fp, "%d %d %d", &u, &v, &capacity) != 3 ||
+            u < 0 || u >= n || v < 0 || v >= n || capacity < 0) {
+            fprintf(stderr, "Invalid edge data\n");
+            fclose(fp);
+            free_graph(graph, n + 1);
+            free(originals);
+            free(demand);
+            free(received);
+            return 1;
         }
+        add_edge(graph, &originals, &edge_count, &edge_cap, u, v, capacity);
     }
 
     if (fscanf(fp, "%d", &demand_count) != 1 || demand_count < 0) {
         fprintf(stderr, "Invalid demand count\n");
         fclose(fp);
-        free_graph(graph, n);
+        free_graph(graph, n + 1);
         free(originals);
         free(demand);
+        free(received);
         return 1;
     }
 
@@ -239,45 +236,41 @@ int main(int argc, char **argv) {
         if (fscanf(fp, "%d %d", &node, &need) != 2 || node < 0 || node >= n || need < 0) {
             fprintf(stderr, "Invalid demand data\n");
             fclose(fp);
-            free_graph(graph, n);
+            free_graph(graph, n + 1);
             free(originals);
             free(demand);
+            free(received);
             return 1;
         }
         demand[node] += need;
         total_demand += need;
+        
+        add_edge(graph, &originals, &edge_count, &edge_cap, node, n, need);
     }
 
     fclose(fp);
 
-    max_flow = edmonds_karp(graph, n, 0, n - 1);
+    max_flow = edmonds_karp(graph, n + 1, 0, n);
 
-    received = (int *)calloc((size_t)n, sizeof(int));
-    if (received == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        free_graph(graph, n);
-        free(originals);
-        free(demand);
-        return 1;
+    if (max_flow == total_demand) {
+        all_satisfied = 1;
+    } else {
+        all_satisfied = 0;
     }
 
-    for (i = 0; i < edge_count; i++) {
+    for (i = real_edge_count; i < edge_count; i++) { 
         Edge *e = originals[i].edge;
-        received[e->to] += e->flow;
-    }
-
-    for (i = 0; i < n; i++) {
-        if (demand[i] > 0 && received[i] < demand[i]) {
-            all_satisfied = 0;
+        if (e->to == n) {
+            received[originals[i].from] += e->flow;
         }
     }
 
-    printf("Bike sharing max flow from %d to %d = %d\n", 0, n - 1, max_flow);
+    printf("\nBike sharing max flow from %d to %d = %d\n", 0, n, max_flow);
     printf("Total customer reservations = %d\n", total_demand);
     printf("All reservations satisfied at every location? %s\n\n", all_satisfied ? "YES" : "NO");
 
     printf("Flow assigned to each transportation edge:\n");
-    for (i = 0; i < edge_count; i++) {
+    for (i = 0; i < real_edge_count; i++) {
         Edge *e = originals[i].edge;
         printf("  %d -> %d : flow %d / capacity %d\n",
                originals[i].from, e->to, e->flow, e->capacity);
@@ -292,7 +285,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    free_graph(graph, n);
+    free_graph(graph, n + 1);
     free(originals);
     free(demand);
     free(received);

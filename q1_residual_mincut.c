@@ -123,6 +123,24 @@ int main(int argc, char **argv) {
 
     dfs(0, residual, visited);
 
+if (visited[N-1]) {
+    fprintf(stderr,
+        "Warning: sink t is still reachable in the residual graph.\n"
+        "The given flow is NOT maximal (an augmenting path exists),\n"
+        "so the computed min-cut below is INVALID.\n");
+}
+
+for (u = 1; u < N - 1; u++) {
+    int in = 0, out = 0;
+    for (i = 0; i < edge_count; i++) {
+        if (edges[i].to   == u) in  += edges[i].flow;
+        if (edges[i].from == u) out += edges[i].flow;
+    }
+    if (in != out)
+        fprintf(stderr, "Warning: flow conservation violated at node %s (in=%d, out=%d)\n",
+                name[u], in, out);
+}
+
     printf("Question 1: residual graph and minimum cut\n");
     printf("Given flow value = %d\n\n", max_flow);
 
