@@ -1,0 +1,32 @@
+Homework Recheck Summary
+========================
+
+ตรวจรอบล่าสุด:
+1. q1_residual_mincut.c
+   - อ่าน input/q1_input.txt ได้แล้ว
+   - สร้าง residual graph จาก flow/capacity ถูกต้อง
+   - ได้ minimum cut capacity = 28
+
+2. q2_maxflow.c
+   - อ่าน input ตามโจทย์ได้: บรรทัดแรกเป็น N และบรรทัดถัดไปเป็น triplets i j capacity
+   - ใช้ adjacency list
+   - ใช้ BFS เพื่อหา augmenting path ตาม Ford-Fulkerson/Edmonds-Karp
+   - ได้ max flow ของกราฟตัวอย่าง = 19
+
+3. q3_bike_sharing.c
+   - โปรแกรมพร้อมใช้กับข้อมูล Bike sharing
+   - มี template input ให้แล้ว
+   - แต่รูป/PDF ที่ให้มายังไม่มีข้อมูลกราฟ Bike sharing in-class assignment 6-2 จริง
+   - ต้องแทนข้อมูลจริงก่อนจึงจะได้คำตอบสุดท้ายของข้อ 3
+
+ผลการ compile:
+gcc -Wall -Wextra q1_residual_mincut.c -o q1.exe
+gcc -Wall -Wextra q2_maxflow.c -o q2.exe
+gcc -Wall -Wextra q3_bike_sharing.c -o q3.exe
+
+ทั้งสามไฟล์ compile ผ่าน ไม่มี warning
+
+คำสั่ง run:
+.\q1.exe input\q1_input.txt
+.\q2.exe input\q2_sample_input.txt
+.\q3.exe input\q3_bike_template_input.txt

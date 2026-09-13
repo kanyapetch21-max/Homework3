@@ -1,0 +1,73 @@
+Question 1 Explanation
+======================
+
+โจทย์ให้ maximum flow มาแล้วในรูปแบบ flow/capacity บนแต่ละ edge
+ดังนั้น residual capacity คำนวณได้จาก:
+
+1. forward residual edge  u -> v  มีค่า capacity - flow
+2. backward residual edge v -> u  มีค่า flow
+3. แสดงเฉพาะ edge ที่ residual capacity มากกว่า 0
+
+Input ที่ใช้:
+input/q1_input.txt
+
+รูปแบบ input ของข้อ 1:
+บรรทัดที่ 1: จำนวนโหนด N
+บรรทัดที่ 2: จำนวน edge E
+จากนั้นแต่ละบรรทัดเป็น:
+from to flow capacity
+
+ลำดับโหนด:
+0 = s
+1 = 1
+2 = 2
+3 = 3
+4 = 4
+5 = 5
+6 = 6
+7 = t
+
+Residual graph ที่ได้จาก input:
+s -> 5 : 2
+1 -> s : 10
+1 -> 2 : 1
+1 -> 3 : 4
+1 -> 4 : 13
+2 -> 1 : 8
+2 -> 4 : 15
+2 -> t : 2
+3 -> s : 5
+3 -> 5 : 4
+3 -> 6 : 3
+4 -> 1 : 2
+4 -> 3 : 8
+4 -> 6 : 15
+5 -> s : 13
+5 -> 6 : 3
+6 -> 3 : 3
+6 -> 5 : 13
+t -> 2 : 8
+t -> 4 : 10
+t -> 6 : 10
+
+หา minimum cut:
+เริ่มจาก source s แล้วเดินไปตาม residual edge ที่ยังมี capacity เหลือ
+จะได้ reachable set:
+
+S = { s, 3, 5, 6 }
+T = { 1, 2, 4, t }
+
+edge ในกราฟเดิมที่วิ่งจาก S ไป T คือ:
+s -> 1 capacity 10
+3 -> 4 capacity 8
+6 -> t capacity 10
+
+ดังนั้น cut capacity = 10 + 8 + 10 = 28
+
+คำตอบข้อ 1:
+Minimum cut = ({s, 3, 5, 6}, {1, 2, 4, t})
+Corresponding cut capacity = 28
+
+ตรวจสอบ:
+flow value จาก source = 10 + 5 + 13 = 28
+ซึ่งเท่ากับ cut capacity จึงสอดคล้องกับ Max-flow Min-cut theorem
