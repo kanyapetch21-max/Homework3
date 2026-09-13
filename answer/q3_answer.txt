@@ -1,0 +1,14 @@
+Question 3 Answer
+=================
+
+The Bike sharing in-class assignment 6-2 flow network is not included in the provided homework page.
+
+Therefore, the actual numerical answer for Question 3 cannot be determined from the provided file alone.
+
+Source code prepared for this question:
+q3_bike_sharing.c
+
+Required input file to complete the final answer:
+input/q3_bike_template_input.txt
+
+Replace the template values with the actual Bike sharing assignment 6-2 network and reservation demands.

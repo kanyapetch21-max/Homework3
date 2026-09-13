@@ -1,0 +1,12 @@
+Recheck Answer
+==============
+
+Question 1:
+Minimum cut = ({s, 3, 5, 6}, {1, 2, 4, t})
+Cut capacity = 28
+
+Question 2:
+Maximum st-flow = 19
+
+Question 3:
+The actual Bike sharing assignment 6-2 graph is not provided in the attached homework page, so the final numerical max-flow answer cannot be determined from the provided file alone.
